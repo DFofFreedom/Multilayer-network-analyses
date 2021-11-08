@@ -1,25 +1,12 @@
-setwd("~/McMaster postdoc/Analyses/ML nets")#or
-setwd("C:/Users/s02df9/OneDrive/Current Projects/R analysis/ML nets")
+setwd("")#to be completed by user
 
 require(tidyverse)
 require(tnet)
 require(sna)
 
-adult_inters_raw = read.csv("Cuddling interaction - summer.csv", header=T)
-
+#download interaction date from FigShare
 download.file("https://ndownloader.figshare.com/files/21743832", "adult_inters_raw.csv")
-adult_inters_raw_test = read.csv("adult_inters_raw.csv", header=T)
-
-nrow(adult_inters_raw) #4605
-nrow(adult_inters_raw_test) #4589
-
-x <- rbind(adult_inters_raw_test, adult_inters_raw)
-x[! duplicated(x, fromLast=TRUE) & seq(nrow(x)) <= nrow(adult_inters_raw), ]
-
-adult_inters_raw[482:485,]
-adult_inters_raw_test[482:485,]
-
-#Figshare data is missing L483 completely, yet this doesn't show up in matching function?
+adult_inters_raw = read.csv("adult_inters_raw.csv", header=T)
 
 #Start shaping data into useful format
 adult_inters = adult_inters_raw %>% 
@@ -141,13 +128,13 @@ lapply(adult_inters_mx, write_nodelistmany) #prints a null for each colony, but 
 
 #then write unique config file for each colony, with ";" separator between file paths
 write_configmany = function(edgelist){
-  write.table(paste0("D:/Documents/McMaster postdoc/Analyses/ML nets/edgelist2_",unique(edgelist$colony),".txt",
-                     ";D:/Documents/McMaster postdoc/Analyses/ML nets/layerlist_",unique(edgelist$colony),".txt",
-                     ";D:/Documents/McMaster postdoc/Analyses/ML nets/nodelist_",unique(edgelist$colony),".txt"), 
+  write.table(paste0(".../ML nets/edgelist2_",unique(edgelist$colony),".txt", #need to replace "..." with what ever the path for the folder containing all this analysis is
+                     ";.../ML nets/layerlist_",unique(edgelist$colony),".txt",
+                     ";.../ML nets/nodelist_",unique(edgelist$colony),".txt"), 
               file = paste0("config2_",unique(edgelist$colony), ".txt"), #note the "2" here refers to the edgelist with node-node interlayer edges
               quote=F, row.names=FALSE, col.names=FALSE)
 }
 lapply(adult_inters_mx, write_configmany)
 
-#End of code####
+####END####
 
