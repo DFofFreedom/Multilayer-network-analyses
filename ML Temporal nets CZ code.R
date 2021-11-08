@@ -114,14 +114,6 @@ with(attack_to_reduce_data, cor.test(max_info, cv_latency_att, method="spearman"
 download.file("https://ndownloader.figshare.com/files/21743826", "adult_bold_raw.csv")
 adult_bold_raw = read.csv("adult_bold_raw.csv", header=T)
 
-#correct typos
-adult_bold_raw[23,8] = NA 
-adult_bold_raw[77,1] = "PP"
-
-#note 2 lines are different, but think these are both in fact correct in the online dataset
-#one individual ID "P" is mistyped as "PP" (when all others are "P") & 
-#1 case there is no boldness score when figshare dataset has 600 (assume entry trumps blank).
-
 adult_bold = adult_bold_raw %>%
   mutate(spider = factor(paste0(adult_bold_raw$Individual,"_",adult_bold_raw$colony))) %>%
   gather(week, shyness, X1:X7) %>%
