@@ -28,7 +28,7 @@ adult_inters_reduce = list()
 for (i in 1:length(unique(adult_inters$Colony))) {
   tryCatch({
     adult_inters_reduce[[i]] = GetMultilayerReducibility(
-      adult_inters_SAM[[i]],
+      as.matrix(adult_inters_SAM[[i]]),
       Layers = length(unique(adult_inters_mx[[i]]$layer1)),
       Nodes = length(unique(adult_inters_mx[[i]]$node1)),
       Method="single",
