@@ -1,12 +1,11 @@
-setwd("")#to be completed by user
-
-require(tidyverse)
-require(tnet)
-require(sna)
+library(tidyverse)
+library(tnet)
+library(sna)
+library(here) # for file paths. The default directory is the root project folder.
 
 #download interaction date from FigShare
 download.file("https://ndownloader.figshare.com/files/21743832", "adult_inters_raw.csv")
-adult_inters_raw = read.csv("adult_inters_raw.csv", header=T)
+adult_inters_raw <- read.csv("adult_inters_raw.csv", header=T)
 
 #Start shaping data into useful format
 adult_inters = adult_inters_raw %>% 
