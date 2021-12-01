@@ -65,7 +65,8 @@ col_info_summ = col_info_data %>%
 
 #Load adult prey attack speed data
 #Download from figshare
-download.file("https://ndownloader.figshare.com/files/21743820", "adult_prey_raw.csv")
+download.file("https://ndownloader.figshare.com/files/21743820", 
+              destfile = here("data", "adult_prey_raw.csv"))
 adult_prey = read.csv("adult_prey_raw.csv", header=T)
 
 names(adult_prey) = gsub("\\.", "_", names(adult_prey)) #replace full stops with underscores
@@ -109,7 +110,8 @@ with(attack_to_reduce_data, cor.test(max_info, cv_latency_att, method="spearman"
 #We don't allow anyone to be keystone if all indivs did not react (got 0s)
 
 
-download.file("https://ndownloader.figshare.com/files/21743826", "adult_bold_raw.csv")
+download.file("https://ndownloader.figshare.com/files/21743826", 
+              destfile = here("data", "adult_bold_raw.csv"))
 adult_bold_raw = read.csv("adult_bold_raw.csv", header=T)
 
 adult_bold = adult_bold_raw %>%
