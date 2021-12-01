@@ -9,7 +9,7 @@ download.file("https://ndownloader.figshare.com/files/21743832",
 adult_inters_raw <- read.csv(here("data", "adult_inters_raw.csv"), header=T)
 
 #Start shaping data into useful format
-adult_inters = adult_inters_raw %>% 
+adult_inters <- adult_inters_raw %>% 
   mutate(node1 = factor(paste0(adult_inters_raw$Spider.1,"_",adult_inters_raw$Colony)),
          node2 = factor(paste0(adult_inters_raw$Spider.2,"_",adult_inters_raw$Colony)),
          layer1  = as.numeric(factor(paste0(adult_inters_raw$Week,"_", adult_inters_raw$Assay.Type))),
@@ -44,7 +44,7 @@ symmetrise_ML = function(edgelist){
     temp_sym_edges = rbind(temp_edges, temp_opp_edges) #sticks the 2 sets of edges together
     temp_sym_edges2 = rbind(temp_sym_edges2,temp_sym_edges) #adds each layer to the already completed ones
   }
-  ; temp_sym_edges2
+  temp_sym_edges2
 }
 
 adult_inters_sym <- lapply(adult_inters_col, symmetrise_ML) #this is now a list where each element is twice as long as it was for "adult_inters_col"
@@ -62,15 +62,18 @@ self_edges <- self_edges %>%
   separate(node1, into = c("NA", "colony"), remove=FALSE, sep="_", convert=T) %>% #add colony ID back in
   select(node1, layer1, node2, layer2, weight, colony)
 
-self_edges2 <- self_edges %>% mutate(layer1 = layer1+1, layer2 = layer2-1) #create other half of symmetrical set of edges
+self_edges2 <- self_edges %>% 
+  mutate(layer1 = layer1+1, layer2 = layer2-1) #create other half of symmetrical set of edges
 
-self_edges_all <- self_edges %>% full_join(self_edges2) %>% #stick together
+self_edges_all <- self_edges %>% 
+  full_join(self_edges2) %>% #stick together
   group_split(colony) #turn into a list by colony to match format of rest of the data.
 
 #combine with symmetrical edgelist
 
 adult_inters_all <- lapply(seq_along(adult_inters_sym),
-                          function(x) rbind(adult_inters_sym[[x]], self_edges_all[[x]]))
+                          function(x) rbind(adult_inters_sym[[x]], 
+                                            self_edges_all[[x]]))
 
 
 #If we're staying in R, muxViz needs each edgelist to number the spiders from 1-number of spiders
@@ -91,15 +94,17 @@ labels_to_muxviz <- function(edgelist){
 #apply function over list
 adult_inters_mx <- lapply(adult_inters_all, labels_to_muxviz)
 #this is the final edgelist to use in the analysis code.
-save(adult_inters_mx, adult_inters, adult_inters_all, file=here("data", "adult_inters_mx.RData"))
+save(adult_inters_mx, adult_inters, adult_inters_all, 
+     file = here("data", "adult_inters_mx.RData"))
 
 
 #Creating data for muxViz export####
 
 #need to export each element of list of edgelists with a unique file name
 write_edgelistmany <- function(edgelist){
-  write.table(edgelist[,1:5], file = paste0("data/edgelist_",unique(edgelist$colony), ".txt"), 
-              row.names=FALSE, col.names=FALSE)
+  write.table(edgelist[,1:5], file = paste0("data/edgelist_",
+                                            unique(edgelist$colony), ".txt"), 
+              row.names=FALSE, col.names = FALSE)
 }
 
 #apply over list
@@ -109,11 +114,11 @@ lapply(adult_inters_mx, write_edgelistmany) #prints a null for each colony, but 
 #This seems stupid as the layerIDs and layerLabels are the same, so perhaps not necessary?
 #now a function to work per edgelist in case they differ in the number of layers, or we change the number of layers in future
 write_layerlistmany <- function(edgelist){
-  write.table(rbind(c('layerID','layerLabel'),
+  write.table(rbind(c('layerID', 'layerLabel'),
                     cbind(1:length(unique(edgelist$layer1)),
                           1:length(unique(edgelist$layer1)))),
-              file = paste0("data/layerlist_",unique(edgelist$colony), ".txt"),
-              row.names=FALSE, col.names=FALSE)
+              file = paste0("data/layerlist_", unique(edgelist$colony), ".txt"),
+              row.names=FALSE, col.names = FALSE)
 }
 lapply(adult_inters_mx, write_layerlistmany)#prints a null for each colony, but its fine
 
@@ -121,21 +126,21 @@ lapply(adult_inters_mx, write_layerlistmany)#prints a null for each colony, but 
 #as before is this necessary?
 
 write_nodelistmany <- function(edgelist){
-  write.table(rbind(c('nodeID','nodeLabel'),
+  write.table(rbind(c('nodeID', 'nodeLabel'),
                     cbind(1:length(unique(edgelist$node1)),
                           1:length(unique(edgelist$node1)))),
-              file = paste0("data/nodelist_",unique(edgelist$colony), ".txt"),
-              row.names=FALSE, col.names=FALSE)
+              file = paste0("data/nodelist_", unique(edgelist$colony), ".txt"),
+              row.names=FALSE, col.names = FALSE)
 }
 lapply(adult_inters_mx, write_nodelistmany) #prints a null for each colony, but its fine
 
 #then write unique config file for each colony, with ";" separator between file paths
 write_configmany <- function(edgelist){
-  write.table(paste0(".../ML nets/edgelist2_",unique(edgelist$colony),".txt", #need to replace "..." with what ever the path for the folder containing all this analysis is
-                     ";.../ML nets/layerlist_",unique(edgelist$colony),".txt",
-                     ";.../ML nets/nodelist_",unique(edgelist$colony),".txt"), 
-              file = paste0("data/config2_",unique(edgelist$colony), ".txt"), #note the "2" here refers to the edgelist with node-node interlayer edges
-              quote=F, row.names=FALSE, col.names=FALSE)
+  write.table(paste0(".../ML nets/edgelist2_", unique(edgelist$colony),".txt", #need to replace "..." with what ever the path for the folder containing all this analysis is
+                     ";.../ML nets/layerlist_", unique(edgelist$colony),".txt",
+                     ";.../ML nets/nodelist_", unique(edgelist$colony),".txt"), 
+              file = paste0("data/config2_", unique(edgelist$colony), ".txt"), #note the "2" here refers to the edgelist with node-node interlayer edges
+              quote = F, row.names = FALSE, col.names = FALSE)
 }
 lapply(adult_inters_mx, write_configmany)
 
