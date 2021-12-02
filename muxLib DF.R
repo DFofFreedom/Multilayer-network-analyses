@@ -1,5 +1,6 @@
 library(Matrix)
 library(RSpectra)
+library(igraph) 
 
 ####################################################
 # MuxNetLib: Library for Multilayer Network Analysis in muxViz
@@ -936,8 +937,6 @@ GetMultiAuthCentrality <- function(SupraAdjacencyMatrix,Layers,Nodes){
 }
 
 GetMultiKCoreCentrality <- function(SupraAdjacencyMatrix,Layers,Nodes){
-    library(igraph)
-
     #calculate centrality in each layer separately and then get the max per node
     kcore.table <- matrix(0, nrow=Nodes, ncol=Layers)
     NodesTensor <- SupraAdjacencyToNodesTensor(SupraAdjacencyMatrix,Layers,Nodes)
@@ -1044,9 +1043,6 @@ GetMultiPageRankCentrality <- function(SupraAdjacencyMatrix,Layers,Nodes){
 
 GetConnectedComponents <- function(SupraAdjacencyMatrix,Layers,Nodes){
     # Return the component assignment for each node
-    
-    library(igraph)
-    
     g <- as.undirected(graph.adjacency(SupraAdjacencyMatrix))
     clu <- components(g)
     Components <- as.numeric(clu$membership)
