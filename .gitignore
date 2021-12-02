@@ -1,0 +1,12 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# exclude all the data in the data/ folder
+data/*
+
+# keep a blank file so that the directory will show up on GH
+!data/.gitkeep 
+
+.DS_Store
